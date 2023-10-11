@@ -1,27 +1,52 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title>ToDo List</title>
-    <style>
-
-    </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Montserrat"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css?family=Raleway"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@2.2.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <title>Todo</title>
   </head>
   <body>
-    <h1>#TODO</h1>
-    <input type="text" id="add_item" placeholder="Add Details" />
-    <input type="button" value="Add" /><br /><br /><br />
+    <main class="main">
+      <h1 class="title">#todo</h1>
+      <header class="todo-header">
+        <ul class="todo-options" id="todo-options">
+          <li class="todo-option todo-option--active" id="all">All</li>
+          <li class="todo-option" id="active">Active</li>
+          <li class="todo-option" id="complete">Completed</li>
+        </ul>
+      </header>
 
-    <div>
-    <input type="button" value="All" />
-    <input type="button" value="Active" />
-    <input type="button" value="Completed" />
-    </div>
-    
-    <input type="checkbox" id="item1" name="item1" />
-    <label for="item1">Do coding challenge</label><br />
-    <input type="checkbox" id="item2" name="item2" />
-    <label for="item2">Do coding challenge</label><br />
-    <input type="checkbox" id="item3" name="item3" />
-    <label for="item3">Do coding challenge</label>
+      <form class="todo-form" id="todo-form">
+        <input
+          class="todo-input"
+          type="text"
+          name="task"
+          placeholder="add details"
+        />
+        <input class="todo-submit" type="submit" value="Add" />
+      </form>
+
+      <ul class="todo-tasks" id="tasks-list"></ul>
+
+      <div class="erase-button" id="erase-button">
+        <i class="ri-delete-bin-line erase-button-icon"></i>
+        <p class="erase-button-text">Delete All</p>
+      </div>
+    </main>
+
+    <script src="index.js"></script>
   </body>
 </html>
