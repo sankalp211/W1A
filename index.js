@@ -18,7 +18,7 @@ const fragment = document.createDocumentFragment();
 // FUNCTIONS
 const addTask = (task) => {
   const taskObj = {
-    id: Math.random(),
+    id: (Math.random() + 1).toString(5).substring(2),
     task: task,
     completed: false,
   };
