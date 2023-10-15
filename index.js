@@ -121,9 +121,6 @@ function handleCheckboxClick(event, calledFrom) {
   if (item) {
     item.isCompleted = !item.isCompleted;
     localStorage.setItem("todo", JSON.stringify(tasks));
-    console.log(
-      `Checkbox with ID ${itemId} clicked. New isCompleted value: ${item.isCompleted}`
-    );
     if (calledFrom === "all") {
       handleAllClick();
     } else if (calledFrom === "active") {
@@ -133,7 +130,6 @@ function handleCheckboxClick(event, calledFrom) {
 }
 
 function handleAllClick() {
-  console.log("All clicked");
   options.forEach((options) =>
       options.classList.remove("todo-option--active")
     );
@@ -145,7 +141,6 @@ function handleAllClick() {
 }
 
 function handleActiveClick() {
-  console.log("Active clicked");
   options.forEach((options) =>
       options.classList.remove("todo-option--active")
     );
@@ -157,14 +152,12 @@ function handleActiveClick() {
 }
 
 function handleCompletedClick() {
-  console.log("handleCompletedClick");
   options.forEach((options) =>
       options.classList.remove("todo-option--active")
     );
     completedTab.classList.add("todo-option--active")
   form.classList.remove("todo-form");
   form.classList.add("todo-form--hidden");
-  console.log(tasks.length)
   if (tasks.length <= 1) {
     deleteAllButton.classList.remove("erase-button--active")
   } else {
@@ -172,7 +165,6 @@ function handleCompletedClick() {
   }
   
   currentOption = "complete";
-  console.log("Completed clicked");
   displayCompletedItems(tasks);
 }
 
@@ -184,7 +176,6 @@ function handleDeleteItemClick(event) {
   if (itemIndex !== -1) {
     tasks.splice(itemIndex, 1);
     localStorage.setItem("todo", JSON.stringify(tasks));
-    console.log(`Deleted item with ID ${itemId}`);
     handleCompletedClick();
   }
 }
@@ -208,13 +199,11 @@ document.addEventListener("click", (event) => {
 document.addEventListener("DOMContentLoaded", () => {
   tasks = JSON.parse(localStorage.getItem("todo")) || [];
   nextId = localStorage.getItem("nextId") || 1;
-  console.log(nextId);
   loadCurrentOption();
 });
 
 function handleDeleteAllClick() {
   tasks = tasks.filter((item) => !item.isCompleted);
-  console.log("delete-all function triggered");
   syncStorage()
   displayCompletedItems(tasks );
 }
