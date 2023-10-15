@@ -187,3 +187,21 @@ body {
   line-height: 15px;
   text-align: left;
 }
+
+.task-item-checkbox {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  margin-right: 8px;
+}
+
+.task-list {
+  list-style-type: none;
+}
+
+.todo-items-completed {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%; /* Ensure the container takes up the full width */
+}

@@ -1,11 +1,13 @@
-const optionContainer = document.getElementById("todo-options");
 const options = document.querySelectorAll(".todo-option");
-const form = document.getElementById("todo-form");
-const tasksContainer = document.getElementById("tasks-list");
-const eraseButton = document.getElementById("erase-button");
+const form = document.querySelector("form");
+const allTab = document.getElementById("all");
+const activeTab = document.getElementById("active");
+const completedTab = document.getElementById("complete")
+const deleteAllButton = document.getElementById("erase-button");
 
 var tasks = [];
 var task;
+var nextId = 1;
 var complete = false;
 var currentOption = "all";
 
@@ -18,91 +20,174 @@ const fragment = document.createDocumentFragment();
 // FUNCTIONS
 const addTask = (task) => {
   const taskObj = {
-    id: (Math.random() + 1).toString(5).substring(2),
+    id: nextId,
     task: task,
     completed: false,
   };
+  nextId++;
+  localStorage.setItem("nextId", nextId);
   tasks = [...tasks, taskObj];
-  loadAllTask(tasks);
+  loadCurrentOption();
   syncStorage();
-};
-
-const loadActiveTask = () => {
-  complete = false;
-  loadAllTask(tasks.filter((task) => !task.completed));
-};
-
-const loadCompletedTask = () => {
-  complete = true;
-  loadAllTask(tasks.filter((task) => task.completed));
 };
 
 const loadCurrentOption = () => {
   currentOption == "all"
-    ? loadAllTask(tasks)
+    ? displayAllItems(tasks)
     : currentOption == "active"
-    ? loadActiveTask()
-    : loadCompletedTask();
+    ? displayActiveItems(tasks)
+    : displayCompletedItems(tasks);
 };
 
-const loadAllTask = (tasks) => {
-  tasksContainer.textContent = "";
+const generateAllItems = (arr) => {
+  let returnString = '<ul class="task-list">';
+  for (let i = 0; i < arr.length; i++) {
+    const item = arr[i];
+    const isChecked = item.isCompleted ? "checked" : "";
+    const itemStyle = item.isCompleted ? "text-decoration: line-through;" : "";
+    returnString += `<li class="todo-items">
+        <input type="checkbox" class="task-item-checkbox" data-id="${item.id}" onclick="handleCheckboxClick(event,'all')" ${isChecked} />
+        <span class= "task-label" style="${itemStyle}">${item.task}</span>
+      </li>`;
+  }
+  returnString += '</ul>'
+  return returnString;
+};
 
-  tasks.forEach((taskObj) => {
-    const { id, task, completed } = taskObj;
-
-    const li = document.createElement("LI");
-    li.classList.add("task");
-
-    const div = document.createElement("DIV");
-    div.classList.add("task-check");
-    div.innerHTML = `
-            <input class="task-input" type="checkbox" id="${id}">
-            <p  class="task-label"  for="${id}">${task}</p>
-        `;
-    if (completed) div.firstElementChild.checked = true;
-    li.appendChild(div);
-
-    const i = document.createElement("I");
-    if (complete) {
-      i.classList.add("task-erase", "ri-delete-bin-line");
-      eraseButton.classList.add("erase-button--active");
-    } else {
-      i.classList.remove("task-erase", "ri-delete-bin-line");
-      eraseButton.classList.remove("erase-button--active");
+const generateActiveItems = (arr) => {
+  let returnString = '<ul class="task-list">';
+  for (let i = 0; i < arr.length; i++) {
+    if (!arr[i].isCompleted) {
+      const item = arr[i];
+      const isChecked = item.isCompleted ? "checked" : "";
+      const itemStyle = item.isCompleted
+        ? "text-decoration: line-through;"
+        : "";
+      returnString += `<li class="todo-items">
+        <input type="checkbox" class="task-item-checkbox" data-id="${item.id}" onclick="handleCheckboxClick(event,'active')" ${isChecked} />
+        <span class= "task-label" style="${itemStyle}">${item.task}</span>
+      </li>`;
     }
-    i.dataset.id = id;
-    li.appendChild(i);
-
-    fragment.appendChild(li);
-  });
-  tasksContainer.appendChild(fragment);
+  }
+  returnString += "</ul>"
+  return returnString;
 };
 
-// EVENT LISTENERS
-optionContainer.addEventListener("click", (e) => {
-  if (e.target.classList.contains("todo-option")) {
-    options.forEach((options) =>
+const generateCompletedItems = (arr) => {
+  let returnString = '<ul class="task-list">';
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i].isCompleted) {
+      const item = arr[i];
+      returnString += `<li class="todo-items">
+        <div class="todo-items-completed">
+          <span class= "task-label" style="text-decoration: line-through;">${item.task}</span>
+          <i class="ri-delete-bin-6-line" data-id="${item.id}" onclick="handleDeleteItemClick(event)"></i>
+        </div>
+      </li>`;
+    }
+  }
+  returnString += "</ul>";
+  return returnString;
+};
+
+const displayAllItems = (arr) => {
+  document.getElementById("tasks-list").innerHTML = `
+<ul class="todo-item-list">
+${generateAllItems(arr)}
+</ul>`;
+};
+
+const displayActiveItems = (arr) => {
+  document.getElementById("tasks-list").innerHTML = `
+<ul class="todo-item-list">
+${generateActiveItems(arr)}
+</ul>`;
+};
+
+const displayCompletedItems = (arr) => {
+  document.getElementById("tasks-list").innerHTML = `
+    <div style="display:flex;justify-content:left;width=100%;">
+      <ul class="todo-item-list">
+        ${generateCompletedItems(arr)}
+      </ul>
+    </div>`;
+};
+
+function handleCheckboxClick(event, calledFrom) {
+  const checkbox = event.target;
+  const itemId = checkbox.getAttribute("data-id");
+  const item = tasks.find((item) => item.id == itemId);
+
+  if (item) {
+    item.isCompleted = !item.isCompleted;
+    localStorage.setItem("todo", JSON.stringify(tasks));
+    console.log(
+      `Checkbox with ID ${itemId} clicked. New isCompleted value: ${item.isCompleted}`
+    );
+    if (calledFrom === "all") {
+      handleAllClick();
+    } else if (calledFrom === "active") {
+      handleActiveClick();
+    }
+  }
+}
+
+function handleAllClick() {
+  console.log("All clicked");
+  options.forEach((options) =>
       options.classList.remove("todo-option--active")
     );
-    e.target.classList.add("todo-option--active");
-    if (e.target.id == "all") {
-      complete = false;
-      form.classList.remove("todo-form--hidden");
-      form.classList.add("todo-form");
-      currentOption = "all";
-    } else if (e.target.id == "active") {
-      form.classList.remove("todo-form--hidden");
-      form.classList.add("todo-form");
-      currentOption = "active";
-    } else if (e.target.id == "complete") {
-      form.classList.remove("todo-form");
-      form.classList.add("todo-form--hidden");
-      currentOption = "complete";
-    }
-    loadCurrentOption();
+    form.classList.add("todo-form");
+    form.classList.remove("todo-form--hidden");
+    allTab.classList.add("todo-option--active")
+  displayAllItems(tasks);
+  deleteAllButton.classList.remove("erase-button--active")
+}
+
+function handleActiveClick() {
+  console.log("Active clicked");
+  options.forEach((options) =>
+      options.classList.remove("todo-option--active")
+    );
+    form.classList.add("todo-form");
+  form.classList.remove("todo-form--hidden");
+    activeTab.classList.add("todo-option--active")
+  displayActiveItems(tasks);
+  deleteAllButton.classList.remove("erase-button--active")
+}
+
+function handleCompletedClick() {
+  console.log("handleCompletedClick");
+  options.forEach((options) =>
+      options.classList.remove("todo-option--active")
+    );
+    completedTab.classList.add("todo-option--active")
+  form.classList.remove("todo-form");
+  form.classList.add("todo-form--hidden");
+  console.log(tasks.length)
+  if (tasks.length <= 1) {
+    deleteAllButton.classList.remove("erase-button--active")
+  } else {
+    deleteAllButton.classList.add("erase-button--active")
   }
-});
+  
+  currentOption = "complete";
+  console.log("Completed clicked");
+  displayCompletedItems(tasks);
+}
+
+function handleDeleteItemClick(event) {
+  const icon = event.target;
+  const itemId = icon.getAttribute("data-id");
+
+  const itemIndex = tasks.findIndex((item) => item.id == itemId);
+  if (itemIndex !== -1) {
+    tasks.splice(itemIndex, 1);
+    localStorage.setItem("todo", JSON.stringify(tasks));
+    console.log(`Deleted item with ID ${itemId}`);
+    handleCompletedClick();
+  }
+}
 
 form.addEventListener("submit", (e) => {
   e.preventDefault();
@@ -110,53 +195,30 @@ form.addEventListener("submit", (e) => {
 
   if (task.trim().length > 0) {
     addTask(task);
-
-    options.forEach((option) => {
-      option.classList.remove("todo-option--active");
-      if (
-        option.id == "all" &&
-        !option.classList.contains("todo-option--active")
-      ) {
-        option.classList.add("todo-option--active");
-        complete = false;
-        loadAllTask(tasks);
-      }
-    });
     form.reset();
   }
 });
 
-tasksContainer.addEventListener("click", (e) => {
-  if (e.target.checked) {
-    tasks.forEach((task) => {
-      if (task.id == e.target.id) task.completed = true;
-    });
-  } else {
-    tasks.forEach((task) => {
-      if (task.id == e.target.id) task.completed = false;
-    });
+document.addEventListener("click", (event) => {
+  if (event.target.classList.contains("erase-button")) {
+    handleDeleteAllClick();
   }
-
-  loadCurrentOption();
-
-  if (e.target.classList.contains("task-erase")) {
-    tasks = tasks.filter((task) => task.id !== e.target.dataset.id);
-    if (tasks.filter((task) => task.id).length < 2) {
-      eraseButton.classList.remove("erase-button--active");
-    }
-    loadCompletedTask(tasks);
-  }
-  syncStorage();
-});
-
-eraseButton.addEventListener("click", () => {
-  tasks = tasks.filter((task) => !task.completed);
-  eraseButton.classList.remove("erase-button--active");
-  loadCompletedTask(tasks);
-  syncStorage();
 });
 
 document.addEventListener("DOMContentLoaded", () => {
   tasks = JSON.parse(localStorage.getItem("todo")) || [];
-  loadAllTask(tasks);
+  nextId = localStorage.getItem("nextId") || 1;
+  console.log(nextId);
+  loadCurrentOption();
 });
+
+function handleDeleteAllClick() {
+  tasks = tasks.filter((item) => !item.isCompleted);
+  console.log("delete-all function triggered");
+  syncStorage()
+  displayCompletedItems(tasks );
+}
+
+allTab.addEventListener("click", handleAllClick);
+activeTab.addEventListener("click", handleActiveClick);
+completedTab.addEventListener("click", handleCompletedClick);
