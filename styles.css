@@ -100,61 +100,12 @@ body {
   padding-left: 0;
 }
 
-.task {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 0 8px 16px 0;
-}
-
-.task-check {
-  display: flex;
-  align-items: center;
-}
-
-.task-input {
-  margin: 0;
-  border: 1px solid #828282;
-  border-radius: 4px;
-  min-width: 24px;
-  height: 24px;
-}
-
-.task-input:checked {
-  border: none;
-  background-color: #2f80ed;
-}
-
-.task-input:checked::after {
-  content: none;
-}
-
-.task-input:checked ~ .task-label {
-  text-decoration: line-through;
-}
-
-.task-input::after {
-  content: "\f00c";
-  color: #fff;
-  display: none;
-}
-
-.task-input:checked::after {
-  display: block;
-}
-
 .task-label {
   font-family: Montserrat;
   font-size: 18px;
   font-weight: 500;
   line-height: 24px;
   margin: 0 0 0 8px;
-}
-
-.task-erase {
-  display: block;
-  color: #bdbdbd;
-  cursor: pointer;
 }
 
 .erase-button {

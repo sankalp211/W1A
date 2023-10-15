@@ -1,23 +1,27 @@
-const options = document.querySelectorAll(".todo-option");
-const form = document.querySelector("form");
-const allTab = document.getElementById("all");
-const activeTab = document.getElementById("active");
-const completedTab = document.getElementById("complete")
-const deleteAllButton = document.getElementById("erase-button");
+// Variables for DOM elements
+const options = document.querySelectorAll(".todo-option"); // All the tab options
+const form = document.querySelector("form"); // The input form
+const allTab = document.getElementById("all"); // "All" tab
+const activeTab = document.getElementById("active"); // "Active" tab
+const completedTab = document.getElementById("complete"); // "Completed" tab
+const deleteAllButton = document.getElementById("erase-button"); // Delete all button
 
-var tasks = [];
-var task;
-var nextId = 1;
-var complete = false;
-var currentOption = "all";
 
+// Variables for managing tasks and state
+var tasks = []; // Array to store task objects
+var task; // Variable to store the current task
+var nextId = 1; // Next available task ID
+var complete = false; // Completion state (not sure where this is used)
+var currentOption = "all"; // The currently selected option (all, active, or completed)
+
+// Function to synchronize tasks with local storage
 const syncStorage = () => {
   localStorage.setItem("todo", JSON.stringify(tasks));
 };
 
 const fragment = document.createDocumentFragment();
 
-// FUNCTIONS
+// Function to add a new task
 const addTask = (task) => {
   const taskObj = {
     id: nextId,
@@ -31,6 +35,7 @@ const addTask = (task) => {
   syncStorage();
 };
 
+// Function to load tasks based on the current option
 const loadCurrentOption = () => {
   currentOption == "all"
     ? displayAllItems(tasks)
@@ -39,6 +44,7 @@ const loadCurrentOption = () => {
     : displayCompletedItems(tasks);
 };
 
+// Functions to generate HTML for different task lists
 const generateAllItems = (arr) => {
   let returnString = '<ul class="task-list">';
   for (let i = 0; i < arr.length; i++) {
@@ -90,6 +96,7 @@ const generateCompletedItems = (arr) => {
   return returnString;
 };
 
+// Functions to display tasks based on the current option
 const displayAllItems = (arr) => {
   document.getElementById("tasks-list").innerHTML = `
 <ul class="todo-item-list">
@@ -113,6 +120,7 @@ const displayCompletedItems = (arr) => {
     </div>`;
 };
 
+// Function to handle checkbox clicks
 function handleCheckboxClick(event, calledFrom) {
   const checkbox = event.target;
   const itemId = checkbox.getAttribute("data-id");
@@ -129,6 +137,7 @@ function handleCheckboxClick(event, calledFrom) {
   }
 }
 
+// Functions to handle tab clicks
 function handleAllClick() {
   options.forEach((options) =>
       options.classList.remove("todo-option--active")
@@ -168,6 +177,7 @@ function handleCompletedClick() {
   displayCompletedItems(tasks);
 }
 
+// Function to handle delete item click
 function handleDeleteItemClick(event) {
   const icon = event.target;
   const itemId = icon.getAttribute("data-id");
@@ -180,6 +190,7 @@ function handleDeleteItemClick(event) {
   }
 }
 
+// Event listener for the form submission
 form.addEventListener("submit", (e) => {
   e.preventDefault();
   task = form.task.value;
@@ -190,24 +201,28 @@ form.addEventListener("submit", (e) => {
   }
 });
 
+// Event listener for delete all button click
 document.addEventListener("click", (event) => {
   if (event.target.classList.contains("erase-button")) {
     handleDeleteAllClick();
   }
 });
 
+// Event listener when the document is fully loaded
 document.addEventListener("DOMContentLoaded", () => {
   tasks = JSON.parse(localStorage.getItem("todo")) || [];
   nextId = localStorage.getItem("nextId") || 1;
   loadCurrentOption();
 });
 
+// Function to handle the delete all button click
 function handleDeleteAllClick() {
   tasks = tasks.filter((item) => !item.isCompleted);
   syncStorage()
   displayCompletedItems(tasks );
 }
 
+// Event listeners for tab clicks
 allTab.addEventListener("click", handleAllClick);
 activeTab.addEventListener("click", handleActiveClick);
 completedTab.addEventListener("click", handleCompletedClick);
